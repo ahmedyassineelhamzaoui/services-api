@@ -26,6 +26,17 @@ class AuthController extends Controller
         Auth::user()->update(['status' => 'online']);
         return response()->json([
             'success' => 'you are log in',
+            'authorisation' => [
+                'token' => $token,
+                'type' => 'bearer',
+            ]
         ],200);
+    }
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        return response()->json([
+            'success' => 'Successfully logged out',
+        ]);
     }
 }
