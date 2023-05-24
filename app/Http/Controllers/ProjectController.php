@@ -52,4 +52,18 @@ class ProjectController extends Controller
             'success' => 'project has been updated successfuly'
         ]);
     }
+
+    public function deleteProject(Request $request)
+    {
+        $project = Project::where('id', $request->id)->delete();
+        if($project){
+            return response()->json([
+                'success' => 'project has been deleted successfuly'
+            ]);
+        }
+        return response()->json([
+             'error' => 'project not found'
+        ]);
+        
+    }
 }
