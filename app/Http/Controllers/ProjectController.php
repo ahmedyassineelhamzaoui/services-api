@@ -31,4 +31,25 @@ class ProjectController extends Controller
             'success' => 'project has been uploadeed succssfuly'
         ]);
     }
+
+    public function updateProject(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|min:3',
+            'description' => 'required|string|min:3'
+        ]);
+        $project=Project::find($request->id);
+        if($request->hasFile('project_picture')){
+            $image= $request->file('project_picture');
+            $filename= time().$image->getClientOriginalName();
+            $image->move(public_path('/uploads/'),$filename);
+            $project->project_picture=$filename;
+        }
+        $project->title=$request->title;
+        $project->description=$request->description;
+        $project->update();
+        return response()->json([
+            'success' => 'project has been updated successfuly'
+        ]);
+    }
 }
