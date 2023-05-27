@@ -23,7 +23,7 @@ class AuthController extends Controller
         if (!$token) {
             return response()->json([
                 'error' => 'invalid email or password'
-            ],401);
+            ]);
         }
         Auth::user()->update(['status' => 'online']);
         return response()->json([
@@ -32,7 +32,7 @@ class AuthController extends Controller
                 'token' => $token,
                 'type' => 'bearer',
             ]
-        ],200);
+        ]);
     }
     public function logout(Request $request)
     {

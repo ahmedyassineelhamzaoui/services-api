@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\UserController;
 
 
 /*
@@ -29,4 +30,7 @@ Route::controller(ProjectController::class)->group(function(){
     Route::post('createProject','createProject');
     Route::put('updateProject','updateProject');
     Route::delete('deleteProject','deleteProject');
+ });
+ Route::controller(UserController::class)->group(function(){
+    Route::get('users','getAllUsers');
  });
