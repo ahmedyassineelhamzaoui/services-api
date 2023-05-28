@@ -7,10 +7,10 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-
+use Validator;
 
 class AuthController extends Controller
-{
+    {
     public function login(Request $request)
     {
         
@@ -42,22 +42,30 @@ class AuthController extends Controller
             'success' => 'Successfully logged out',
         ]);
     }
-   
+    public function refresh()
+    {
+        return response()->json([
+            'status' => 'success',
+            'user' => Auth::user(),
+            'authorisation' => [
+                'token' => Auth::refresh(),
+                'type' => 'bearer',
+            ]
+        ]);
+    }
     public function createUser(Request $request)
     {
-        $request->validate
-        ([
-            'first_name'     => 'required|string|max:20',
-            'last_name'     => 'required|string|max:20',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users')->where(function ($query) use ($request) {
-                    return $query->where('email', $request->email);
-                })
-            ],
-            'password' => 'required|string|min:8',
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required|string|between:2,100',
+            'last_name' => 'required|string|between:2,100',
+            'email' => 'required|string|email|max:100|unique:users',
+            'password' => 'required|string|confirmed|min:6',
         ]);
+
+        if($validator->fails()){
+             return response()->json(['errors' => $validator->errors()]);
+        }
+
         $user = User::create([
             'first_name'     => $request->first_name,
             'last_name'     => $request->last_name,
@@ -65,15 +73,21 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
         $user->assignRole('admin');
-        $token = Auth::login($user);
+        if($user){
+            if($user->hasPermissionTo('create-user')){
+                $users = User::all('first_name','last_name','email','status');
+                return response()->json([
+                    'success' => 'user has been created successfuly',
+                    'users'  => $users
+                ],200);
+            }
+            return response()->json([
+                'permissions' => 'you don\'t have permessions see users'
+            ],403); 
+        }
         return response()->json([
-            'status' => 'success',
-            'message' => 'user has been created successfuly',
-            'user'    => $user,
-            'authorization' => [
-                'token' => $token,
-                'type'  => 'bearer'
-            ]
-        ]);
+            'error' => 'somthing went wrong',
+        ],404);
+
     }
 }

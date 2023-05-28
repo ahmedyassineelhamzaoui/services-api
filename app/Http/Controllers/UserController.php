@@ -20,11 +20,11 @@ class UserController extends Controller
                 ]);
             }
             return response()->json([
-                'success' => $users
+                'users' => $users
             ]);
         }
         return response()->json([
-            'info' => 'somethin went wrong'
+            'info' => 'something went wrong'
         ]);
     }
 }
