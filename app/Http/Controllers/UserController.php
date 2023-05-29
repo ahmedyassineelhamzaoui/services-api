@@ -12,7 +12,7 @@ class UserController extends Controller
     public function getAllUsers()
     {
         $user = auth()->user();
-        $users = User::all('first_name','last_name','email','status');
+        $users = User::all('id','first_name','last_name','email','status');
         if($user){
             if(!$user->hasPermissionTo('user-list')){
                 return response()->json([

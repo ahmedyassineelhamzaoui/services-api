@@ -55,39 +55,65 @@ class AuthController extends Controller
     }
     public function createUser(Request $request)
     {
+        $userauth = auth()->user();
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|between:2,100',
             'last_name' => 'required|string|between:2,100',
             'email' => 'required|string|email|max:100|unique:users',
-            'password' => 'required|string|confirmed|min:6',
+            'password' => 'required|string|min:6',
         ]);
 
         if($validator->fails()){
              return response()->json(['errors' => $validator->errors()]);
         }
-
-        $user = User::create([
-            'first_name'     => $request->first_name,
-            'last_name'     => $request->last_name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
-        $user->assignRole('admin');
-        if($user){
-            if($user->hasPermissionTo('create-user')){
+        if($userauth){
+            if($userauth->hasPermissionTo('user-create')){
                 $users = User::all('first_name','last_name','email','status');
+                $user = User::create([
+                    'first_name'     => $request->first_name,
+                    'last_name'     => $request->last_name,
+                    'email'    => $request->email,
+                    'status'   => 'offline',
+                    'password' => Hash::make($request->password)
+                ]);
+                $user->assignRole('admin');
                 return response()->json([
                     'success' => 'user has been created successfuly',
-                    'users'  => $users
-                ],200);
+                    'user'  => $user
+                ]);
             }
             return response()->json([
                 'permissions' => 'you don\'t have permessions see users'
-            ],403); 
+            ]); 
         }
         return response()->json([
             'error' => 'somthing went wrong',
-        ],404);
+        ]);
 
     }
+    public function deleteUser(Request $request)
+    {
+        $authUser = auth()->user();
+        if($authUser){
+            if($authUser->hasPermissionTo('user-delete')){
+                $user = User::find($request->id);
+                if($user){
+                    $user->delete();
+                    return response()->json([
+                        'success' => 'user deleted successfuly'
+                    ]);
+                }
+                return response()->json([
+                    'error' => 'not found'
+                ]);
+            }
+            return response()->json([
+                'permessions' => 'permessions not allowd'
+            ]);
+        }
+        return response()->json([
+            'error' => 'user not found'
+        ]);
+    }
+        
 }
