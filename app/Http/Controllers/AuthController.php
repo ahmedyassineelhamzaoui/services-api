@@ -115,5 +115,66 @@ class AuthController extends Controller
             'error' => 'user not found'
         ]);
     }
+    public function updateUser(Request $request)
+    {
+        $userAuth = auth()->user();
+        if($userAuth){
+           if($userAuth->hasPermissionTo('user-edit')){
+            $user = User::find($request->id);
+              if($user){
+                 if($request->has('first_name')){
+                    $validator = Validator::make($request->all(), [
+                        'first_name' => 'required|string|between:2,100',
+                    ]);
+                    if($validator->fails()){
+                        return response()->json(['errors' => $validator->errors()]);
+                    }
+                     $user->first_name = $request->first_name;
+                 }
+                 if($request->has('last_name')){
+                    $validator = Validator::make($request->all(), [
+                        'last_name' => 'required|string|between:2,100',
+                    ]);
+                    if($validator->fails()){
+                        return response()->json(['errors' => $validator->errors()]);
+                    }
+                    $user->last_name = $request->last_name;
+                 }
+                 if($request->has('email')){
+                    $validator = Validator::make($request->all(), [
+                        'email' => 'required|string|email|max:100',
+                    ]);
+                    if($validator->fails()){
+                        return response()->json(['errors' => $validator->errors()]);
+                    }
+                    $user_email = User::where('email',$request->email)->first()  ;
+
+                    if($user_email){
+                        if($user_email->email == $user->email){
+                            $user->email = $request->email;
+                        }else{
+                            return response()->json(['exist' => 'this email already exist']); 
+                        }
+                    }
+                    $user->email = $request->email;
+                 }
+                 $user->save();
+                 return response()->json([
+                    'success' => 'user has been updated successfuly'
+                 ]);
+              }
+              return response()->json([
+                'error' => 'User not found'
+              ]);
+           }
+           return response()->json([
+            'permissions' => 'permission not allowd'
+         ]);
+        }
+        return response()->json([
+           'error' => 'page not found'
+        ]);
+
+    }
         
 }

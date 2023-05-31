@@ -27,6 +27,7 @@ Route::controller(AuthController::class)->group(function(){
    Route::post('register','createUser');
    Route::post('refresh', 'refresh');   
    Route::delete('deleteUser', 'deleteUser');   
+   Route::put('updateUser', 'updateUser');   
 });
 Route::controller(ProjectController::class)->group(function(){
     Route::post('createProject','createProject');
