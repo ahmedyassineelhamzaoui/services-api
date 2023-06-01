@@ -32,6 +32,7 @@ Route::controller(AuthController::class)->group(function(){
 });
 Route::controller(RoleController::class)->group(function(){
     Route::get('roles','index');
+    Route::post('createrole','createRole');
 });
 Route::controller(ProjectController::class)->group(function(){
     Route::post('createProject','createProject');
