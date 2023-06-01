@@ -60,4 +60,29 @@ class RoleController extends Controller
             'error' => 'anuthorise '
         ]);
     }
+    public function deleteRole(Request $request)
+    {
+        $user=auth()->user();
+        if($user){
+            if($user->hasPermissionTo('role-delete')){
+                $role = Role::find($request->id);
+                if($role){
+                    $role->delete();
+                    return response()->json([
+                        'success' => 'role deleted successfuly  '
+                    ]);
+                }
+                return response()->json([
+                    'error' => 'role not exist'
+                ]);
+            }
+            return response()->json([
+                'permissions' => 'permission not alowd'
+            ]);
+         }
+         return response()->json([
+            'error' => 'anauthorized'
+         ]);
+    
+    }
 }
