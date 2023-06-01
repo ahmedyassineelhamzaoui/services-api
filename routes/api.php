@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\RoleController;
 
 
 /*
@@ -28,6 +29,9 @@ Route::controller(AuthController::class)->group(function(){
    Route::post('refresh', 'refresh');   
    Route::delete('deleteUser', 'deleteUser');   
    Route::put('updateUser', 'updateUser');   
+});
+Route::controller(RoleController::class)->group(function(){
+    Route::get('roles','index');
 });
 Route::controller(ProjectController::class)->group(function(){
     Route::post('createProject','createProject');
