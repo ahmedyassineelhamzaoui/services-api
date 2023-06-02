@@ -85,4 +85,56 @@ class RoleController extends Controller
          ]);
     
     }
+    public function updateRole(Request $request)
+    {
+        $authUser = auth()->user();
+        if($authUser){
+            if($authUser->hasPermissionTo('role-edit')){
+                 $roleToEdit = Role::find($request->id);
+                 if($roleToEdit){
+                     if($request->has('name')){
+                        $validator = Validator::make($request->all(), [
+                            'name' => 'required|string|between:2,20',
+                        ]);
+                        if($validator->fails()){
+                            return response()->json(['errors' => $validator->errors()]);
+                        }
+
+                        $role_exist = Role::where('name',$request->name)->first();
+                        if($role_exist){
+
+                            if($role_exist->name == $roleToEdit->name){
+                                $roleToEdit->name = $request->name;
+                                $roleToEdit->syncPermissions($request->permission);
+                                $roleToEdit->save();
+                        
+                                return response()->json([
+                                    'success' => 'role updated successfuly'
+                                ]);
+                            }
+                            return response()->json([
+                                'exist' => 'this role already exist'
+                            ]);
+                        }
+                        $roleToEdit->name = $request->name;
+                        $roleToEdit->syncPermissions($request->permission);
+                        $roleToEdit->save();
+                        return response()->json([
+                            'success' => 'role updated successfuly'
+                        ]);
+                        
+                     }
+                 } 
+                 return response()->json([
+                    'error' => 'Role not found'
+                 ]);
+            }
+            return response()->json([
+                'permissions' => 'permission not alowed'
+            ]);
+        }
+        return response()->json([
+            'error' => 'anuthorized'
+        ]);
+    }
 }

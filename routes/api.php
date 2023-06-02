@@ -34,6 +34,7 @@ Route::controller(RoleController::class)->group(function(){
     Route::get('roles','index');
     Route::post('createrole','createRole');
     Route::delete('deleterole','deleteRole');
+    Route::put('updaterole','updateRole');
 });
 Route::controller(ProjectController::class)->group(function(){
     Route::post('createProject','createProject');
